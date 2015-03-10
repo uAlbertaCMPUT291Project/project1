@@ -1,3 +1,5 @@
+//Author: Nelson
+
 import java.sql.*;
 public class DatabaseConnection {
 	static private Connection connection;

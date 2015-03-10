@@ -1,3 +1,4 @@
+//Author: Nelson
 
 public class AutoTransaction extends ApplicationProgram {
 
