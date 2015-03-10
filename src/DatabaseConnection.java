@@ -1,24 +1,26 @@
 //Author: Nelson
 
 import java.sql.*;
+
 public class DatabaseConnection {
-	static private Connection connection;
-	
-	public DatabaseConnection(String username, String password, String url){
-		
-		if (connection==null){
-			try{ 
-				DatabaseConnection.connection = DriverManager.getConnection(url,username,password);
-			}catch (SQLException e){
-				e.printStackTrace();
-			}
-		}
-		
+	static public Connection connection;
+
+	public DatabaseConnection() {
+
 	}
-	
-	public static Connection getConnection(){
+
+	public void createConncetion(String username, String password, String url)
+			throws SQLException {
+
+		if (connection == null) {
+			DatabaseConnection.connection = DriverManager.getConnection(url,
+					username, password);
+		}
+
+	}
+
+	public static Connection getConnection() {
 		return DatabaseConnection.connection;
 	}
-	
-	
+
 }
