@@ -20,31 +20,36 @@ public class NewVehicleRegistration extends ApplicationProgram {
 		// TODO Auto-generated method stub
 		//involved tables: vehicle, owner, people
 		//owner sin and vehicle id shared in owner table
+				
 		
 		//get vehicle id/info from user	
-		System.out.println("Enter vehicle serial number");
+		System.out.println("Enter vehicle serial number:");
 		String serial_no = user_input.next();
-		System.out.println("Enter vehicle maker");
+		//check if vehicle already exists
+		
+		System.out.println("Enter vehicle maker:");
 		String maker = user_input.next();
-		System.out.println("Enter vehicle model");
+		System.out.println("Enter vehicle model:");
 		String model = user_input.next();
-		System.out.println("Enter vehicle year");
+		System.out.println("Enter vehicle year:");
 		String year = user_input.next();
-		System.out.println("Enter vehicle color");
+		System.out.println("Enter vehicle color:");
 		String color = user_input.next();
 		
 		//idea - display vehicle types and their id's
-		System.out.println("Enter vehicle type id");
+		System.out.println("Enter vehicle type id:");
 		String type_id = user_input.next();
+
 		
 		//check that the vehicle does not exist already
 		//if exists - tell user & start over? (will it do this already when it tries to add??)
 		
+		
 		//add vehicle to vehicle table, if it  exists
 		try{
 			Statement statement = DatabaseConnection.getConnection().createStatement();
-			String vehicleStmt = "insert into vehicle values ('"+serial_no+"', '"+maker+"', "
-										+model+"', '"+year+"', '"+color+"', '"+type_id+");";
+			String vehicleStmt = "insert into vehicle values ('"+serial_no+"', '"+maker+"', '"
+										+model+"', "+year+", '"+color+"', "+type_id+")";
 			statement.executeUpdate(vehicleStmt);
 		} catch (SQLException e){
 			e.printStackTrace();
@@ -52,41 +57,51 @@ public class NewVehicleRegistration extends ApplicationProgram {
 		
 		//add vehicle to vehicle, get people (check existance - add if neccessary), add owner 
 		//person
-		System.out.println("Enter owner's sin");
+		System.out.println("Enter owner's sin:");
 		String sin = user_input.next();
 		
+		//check if person exists
+		//check if person is already in people table
+		//if not add all their info
+		try{
+			Statement statement = DatabaseConnection.getConnection().createStatement();
+			String checkPeopleStmt = "select people.sin " +
+					"from people" +
+					"where people.sin="+sin;
+			statement.executeQuery(checkPeopleStmt);
+		} catch (SQLException e){
+			e.printStackTrace();
+		}
+		
 		//person - if neccessary (sin does not exist in table)
-		System.out.println("Enter owner's name");
+		System.out.println("Enter owner's name:");
 		String name = user_input.next();
-		System.out.println("Enter owner's height");
+		System.out.println("Enter owner's height:");
 		String height = user_input.next();
-		System.out.println("Enter owner's weight");
+		System.out.println("Enter owner's weight:");
 		String weight = user_input.next();
-		System.out.println("Enter owner's eye color");
+		System.out.println("Enter owner's eye color:");
 		String eyecolor = user_input.next();
-		System.out.println("Enter owner's hair color");
+		System.out.println("Enter owner's hair color:");
 		String haircolor = user_input.next();
-		System.out.println("Enter owner's address");
+		System.out.println("Enter owner's address:");
 		String address = user_input.next();
-		System.out.println("Enter owner's gender (m/f)");
+		System.out.println("Enter owner's gender (m/f):");
 		String gender = user_input.next();
-		System.out.println("Enter owner's birthday");
+		System.out.println("Enter owner's birthday:");
 		String birthday = user_input.next();
 
 
 		
-		//check if person is already in people table
-		//if not add all their info
-		
 		//is primary owner??
-		System.out.println("Are they the primary owner? (y/n)");
+		System.out.println("Are they the primary owner? (y/n):");
 		String is_primary_owner = user_input.next();
 		
 		//add row to owner
 		try{
 			Statement statement = DatabaseConnection.getConnection().createStatement();
 			String ownerStmt = "insert into owner values ('"+sin+"', '"+serial_no+"', '"
-									+is_primary_owner+"');";
+									+is_primary_owner+"')";
 			statement.executeUpdate(ownerStmt);
 		} catch (SQLException e){
 			e.printStackTrace();
