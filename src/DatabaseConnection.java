@@ -23,4 +23,13 @@ public class DatabaseConnection {
 		return DatabaseConnection.connection;
 	}
 
+	public static void closeConnection() {
+		try {
+			DatabaseConnection.connection.close();
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			System.out
+					.println("error occured while trying to close the database connection");
+		}
+	}
 }
