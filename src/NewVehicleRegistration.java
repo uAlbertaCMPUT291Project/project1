@@ -17,7 +17,6 @@ public class NewVehicleRegistration extends ApplicationProgram {
 		
 		Scanner user_input = new Scanner( System.in );
 		
-		// TODO Auto-generated method stub
 		//involved tables: vehicle, owner, people
 		//owner sin and vehicle id shared in owner table
 				
@@ -42,37 +41,39 @@ public class NewVehicleRegistration extends ApplicationProgram {
 
 		
 		//check that the vehicle does not exist already
-		//if exists - tell user & start over? (will it do this already when it tries to add??)
+		//if exists - tell user & start over - will sql error if this happens?
 		
 		
-		//add vehicle to vehicle table, if it  exists
+		//add vehicle to vehicle table, if it doesn't exists
 		try{
 			Statement statement = DatabaseConnection.getConnection().createStatement();
 			String vehicleStmt = "insert into vehicle values ('"+serial_no+"', '"+maker+"', '"
 										+model+"', "+year+", '"+color+"', "+type_id+")";
 			statement.executeUpdate(vehicleStmt);
+			System.out.println("Vehicle added");
 		} catch (SQLException e){
 			e.printStackTrace();
 		}
 		
-		//add vehicle to vehicle, get people (check existance - add if neccessary), add owner 
+		// get people (check existance - add if neccessary), add owner
+		
 		//person
 		System.out.println("Enter owner's sin:");
 		String sin = user_input.next();
 		
 		//check if person exists
 		//check if person is already in people table
-		//if not add all their info
+		//if not get and add all their info
 		try{
 			Statement statement = DatabaseConnection.getConnection().createStatement();
-			String checkPeopleStmt = "select people.sin " +
-					"from people" +
+			String checkPeopleStmt = "select sin " +
+					"from people " +
 					"where people.sin="+sin;
 			statement.executeQuery(checkPeopleStmt);
 		} catch (SQLException e){
 			e.printStackTrace();
 		}
-		
+		//if (){}
 		//person - if neccessary (sin does not exist in table)
 		System.out.println("Enter owner's name:");
 		String name = user_input.next();
@@ -91,7 +92,15 @@ public class NewVehicleRegistration extends ApplicationProgram {
 		System.out.println("Enter owner's birthday:");
 		String birthday = user_input.next();
 
-
+		//add person - not complete
+		try{
+			Statement statement = DatabaseConnection.getConnection().createStatement();
+			String peopleStmt = "insert into people values ('"+sin+"', "+name+ ")";
+			statement.executeUpdate(peopleStmt);
+		} catch (SQLException e){
+			e.printStackTrace();
+		}
+		
 		
 		//is primary owner??
 		System.out.println("Are they the primary owner? (y/n):");
