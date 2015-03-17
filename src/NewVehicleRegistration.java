@@ -53,6 +53,7 @@ public class NewVehicleRegistration extends ApplicationProgram {
 			System.out.println("Vehicle added");
 		} catch (SQLException e){
 			e.printStackTrace();
+			System.out.print(e.getMessage());
 		}
 		
 		// get people (check existance - add if neccessary), add owner
@@ -72,6 +73,7 @@ public class NewVehicleRegistration extends ApplicationProgram {
 			statement.executeQuery(checkPeopleStmt);
 		} catch (SQLException e){
 			e.printStackTrace();
+			System.out.print(e.getMessage());
 		}
 		//if (statement is not empty){ person already exists}
 		//person - if neccessary (sin does not exist in table)
@@ -91,8 +93,7 @@ public class NewVehicleRegistration extends ApplicationProgram {
 		String gender = user_input.nextLine();
 		System.out.println("Enter owner's birthday (YYYY-MM-DD):");
 		String birthday = user_input.nextLine();
-		
-		System.out.println("");
+
 		
 		//add person - not complete
 		//date yyyy-mm-dd
@@ -101,11 +102,12 @@ public class NewVehicleRegistration extends ApplicationProgram {
 			String peopleStmt = "insert into people values ('"+sin+"', '"+name+"', "
 							+height+", "+weight+", '"+eyecolor+"', '"+haircolor
 							+"', '"+address+"', '"+gender
-							+"', TO_DATE('"+birthday+"', 'YYYY-MM-DD');";
+							+"', TO_DATE('"+birthday+"', 'YYYY-MM-DD'))";
 			statement.executeUpdate(peopleStmt);
 			System.out.println("Person added");
 		} catch (SQLException e){
 			e.printStackTrace();
+			System.out.print(e.getMessage());
 		}
 		
 		
@@ -119,10 +121,11 @@ public class NewVehicleRegistration extends ApplicationProgram {
 			String ownerStmt = "insert into owner values ('"+sin+"', '"+serial_no+"', '"
 									+is_primary_owner+"')";
 			statement.executeUpdate(ownerStmt);
+			System.out.println("Vehicle successfully registered");
 		} catch (SQLException e){
-			e.printStackTrace();
+			//e.printStackTrace();
+			System.out.print(e.getMessage());
 		}
-		
 		
 	}
 
