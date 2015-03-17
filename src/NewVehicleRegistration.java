@@ -23,21 +23,21 @@ public class NewVehicleRegistration extends ApplicationProgram {
 		
 		//get vehicle id/info from user	
 		System.out.println("Enter vehicle serial number:");
-		String serial_no = user_input.next();
+		String serial_no = user_input.nextLine();
 		//check if vehicle already exists
 		
 		System.out.println("Enter vehicle maker:");
-		String maker = user_input.next();
+		String maker = user_input.nextLine();
 		System.out.println("Enter vehicle model:");
-		String model = user_input.next();
+		String model = user_input.nextLine();
 		System.out.println("Enter vehicle year:");
-		String year = user_input.next();
+		String year = user_input.nextLine();
 		System.out.println("Enter vehicle color:");
-		String color = user_input.next();
+		String color = user_input.nextLine();
 		
 		//idea - display vehicle types and their id's
 		System.out.println("Enter vehicle type id:");
-		String type_id = user_input.next();
+		String type_id = user_input.nextLine();
 
 		
 		//check that the vehicle does not exist already
@@ -59,7 +59,7 @@ public class NewVehicleRegistration extends ApplicationProgram {
 		
 		//person
 		System.out.println("Enter owner's sin:");
-		String sin = user_input.next();
+		String sin = user_input.nextLine();
 		
 		//check if person exists
 		//check if person is already in people table
@@ -73,30 +73,37 @@ public class NewVehicleRegistration extends ApplicationProgram {
 		} catch (SQLException e){
 			e.printStackTrace();
 		}
-		//if (){}
+		//if (statement is not empty){ person already exists}
 		//person - if neccessary (sin does not exist in table)
 		System.out.println("Enter owner's name:");
-		String name = user_input.next();
+		String name = user_input.nextLine();
 		System.out.println("Enter owner's height:");
-		String height = user_input.next();
+		String height = user_input.nextLine();
 		System.out.println("Enter owner's weight:");
-		String weight = user_input.next();
+		String weight = user_input.nextLine();
 		System.out.println("Enter owner's eye color:");
-		String eyecolor = user_input.next();
+		String eyecolor = user_input.nextLine();
 		System.out.println("Enter owner's hair color:");
-		String haircolor = user_input.next();
+		String haircolor = user_input.nextLine();
 		System.out.println("Enter owner's address:");
-		String address = user_input.next();
+		String address = user_input.nextLine();
 		System.out.println("Enter owner's gender (m/f):");
-		String gender = user_input.next();
-		System.out.println("Enter owner's birthday:");
-		String birthday = user_input.next();
-
+		String gender = user_input.nextLine();
+		System.out.println("Enter owner's birthday (YYYY-MM-DD):");
+		String birthday = user_input.nextLine();
+		
+		System.out.println("");
+		
 		//add person - not complete
+		//date yyyy-mm-dd
 		try{
 			Statement statement = DatabaseConnection.getConnection().createStatement();
-			String peopleStmt = "insert into people values ('"+sin+"', "+name+ ")";
+			String peopleStmt = "insert into people values ('"+sin+"', '"+name+"', "
+							+height+", "+weight+", '"+eyecolor+"', '"+haircolor
+							+"', '"+address+"', '"+gender
+							+"', TO_DATE('"+birthday+"', 'YYYY-MM-DD');";
 			statement.executeUpdate(peopleStmt);
+			System.out.println("Person added");
 		} catch (SQLException e){
 			e.printStackTrace();
 		}
@@ -104,7 +111,7 @@ public class NewVehicleRegistration extends ApplicationProgram {
 		
 		//is primary owner??
 		System.out.println("Are they the primary owner? (y/n):");
-		String is_primary_owner = user_input.next();
+		String is_primary_owner = user_input.nextLine();
 		
 		//add row to owner
 		try{

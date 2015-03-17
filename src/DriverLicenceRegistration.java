@@ -1,9 +1,11 @@
+import java.util.Scanner;
+
 //Leah
 public class DriverLicenceRegistration extends ApplicationProgram {
 
 	@Override
 	void run() {
-		// TODO Auto-generated method stub
+		Scanner user_input = new Scanner( System.in );
 
 	}
 
