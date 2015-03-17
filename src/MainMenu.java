@@ -1,3 +1,4 @@
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.InputMismatchException;
@@ -18,6 +19,7 @@ public class MainMenu {
 	public static void main(String[] args) {
 		// main connection to database
 		DatabaseConnection connection = new DatabaseConnection();
+		Scanner user_input = new Scanner(System.in);
 		int menu_choice = -1;
 
 		ApplicationProgram auto_program = new AutoTransaction();
@@ -40,6 +42,17 @@ public class MainMenu {
 			if (menu_choice != quit_code) {
 				dictionary.get(menu_choice).run();
 			}
+
+			if (menu_choice != quit_code) {
+				System.out
+						.println("Please press ENTER to go back to the main menu.");
+				try {
+					System.in.read();
+				} catch (IOException e) {
+					// TODO Auto-generated catch block
+				}
+			}
+
 		}
 		System.out.println("Closing connection and Exiting. Bye!");
 
