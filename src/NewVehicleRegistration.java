@@ -11,7 +11,7 @@ import java.util.Scanner;
 //loaded in the initial database.
 
 public class NewVehicleRegistration extends ApplicationProgram {
-
+	int count;
 	@Override
 	void run() {
 		
@@ -70,46 +70,51 @@ public class NewVehicleRegistration extends ApplicationProgram {
 			String checkPeopleStmt = "select sin " +
 					"from people " +
 					"where people.sin="+sin;
-			statement.executeQuery(checkPeopleStmt);
+			ResultSet rs = statement.executeQuery(checkPeopleStmt);
+			count = 0;
+			while (rs.next()){
+				count++;
+			}
 		} catch (SQLException e){
 			e.printStackTrace();
 			System.out.print(e.getMessage());
 		}
 		//if (statement is not empty){ person already exists}
 		//person - if neccessary (sin does not exist in table)
-		System.out.println("Enter owner's name:");
-		String name = user_input.nextLine();
-		System.out.println("Enter owner's height:");
-		String height = user_input.nextLine();
-		System.out.println("Enter owner's weight:");
-		String weight = user_input.nextLine();
-		System.out.println("Enter owner's eye color:");
-		String eyecolor = user_input.nextLine();
-		System.out.println("Enter owner's hair color:");
-		String haircolor = user_input.nextLine();
-		System.out.println("Enter owner's address:");
-		String address = user_input.nextLine();
-		System.out.println("Enter owner's gender (m/f):");
-		String gender = user_input.nextLine();
-		System.out.println("Enter owner's birthday (YYYY-MM-DD):");
-		String birthday = user_input.nextLine();
+		if (count!=0){
+			System.out.println("Enter owner's name:");
+			String name = user_input.nextLine();
+			System.out.println("Enter owner's height:");
+			String height = user_input.nextLine();
+			System.out.println("Enter owner's weight:");
+			String weight = user_input.nextLine();
+			System.out.println("Enter owner's eye color:");
+			String eyecolor = user_input.nextLine();
+			System.out.println("Enter owner's hair color:");
+			String haircolor = user_input.nextLine();
+			System.out.println("Enter owner's address:");
+			String address = user_input.nextLine();
+			System.out.println("Enter owner's gender (m/f):");
+			String gender = user_input.nextLine();
+			System.out.println("Enter owner's birthday (YYYY-MM-DD):");
+			String birthday = user_input.nextLine();
 
-		
-		//add person - not complete
-		//date yyyy-mm-dd
-		try{
-			Statement statement = DatabaseConnection.getConnection().createStatement();
-			String peopleStmt = "insert into people values ('"+sin+"', '"+name+"', "
-							+height+", "+weight+", '"+eyecolor+"', '"+haircolor
-							+"', '"+address+"', '"+gender
-							+"', TO_DATE('"+birthday+"', 'YYYY-MM-DD'))";
-			statement.executeUpdate(peopleStmt);
-			System.out.println("Person added");
-		} catch (SQLException e){
-			e.printStackTrace();
-			System.out.print(e.getMessage());
+			
+			//add person - not complete
+			//date yyyy-mm-dd
+			try{
+				Statement statement = DatabaseConnection.getConnection().createStatement();
+				String peopleStmt = "insert into people values ('"+sin+"', '"+name+"', "
+								+height+", "+weight+", '"+eyecolor+"', '"+haircolor
+								+"', '"+address+"', '"+gender
+								+"', TO_DATE('"+birthday+"', 'YYYY-MM-DD'))";
+				statement.executeUpdate(peopleStmt);
+				System.out.println("Person added");
+			} catch (SQLException e){
+				e.printStackTrace();
+				System.out.print(e.getMessage());
+			}
 		}
-		
 		
 		//is primary owner??
 		System.out.println("Are they the primary owner? (y/n):");
