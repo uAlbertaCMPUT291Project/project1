@@ -52,11 +52,12 @@ public class NewVehicleRegistration extends ApplicationProgram {
 			statement.executeUpdate(vehicleStmt);
 			System.out.println("Vehicle added");
 		} catch (SQLException e){
-			e.printStackTrace();
+			//e.printStackTrace();
 			System.out.print(e.getMessage());
+			//try again
 		}
 		
-		// get people (check existance - add if neccessary), add owner
+		// get people (check existence - add if neccessary), add owner
 		
 		//person
 		System.out.println("Enter owner's sin:");
@@ -66,7 +67,8 @@ public class NewVehicleRegistration extends ApplicationProgram {
 		//check if person is already in people table
 		//if not get and add all their info
 		try{
-			Statement statement = DatabaseConnection.getConnection().createStatement();
+			Statement statement = DatabaseConnection.getConnection().createStatement(
+											ResultSet.TYPE_SCROLL_INSENSITIVE,ResultSet.CONCUR_READ_ONLY);
 			String checkPeopleStmt = "select sin " +
 					"from people " +
 					"where people.sin="+sin;
@@ -80,7 +82,7 @@ public class NewVehicleRegistration extends ApplicationProgram {
 			System.out.print(e.getMessage());
 		}
 		//if (statement is not empty){ person already exists}
-		//person - if neccessary (sin does not exist in table)
+		//person - if necessary (sin does not exist in table)
 		if (count!=0){
 			System.out.println("Enter owner's name:");
 			String name = user_input.nextLine();
