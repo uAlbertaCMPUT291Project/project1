@@ -73,10 +73,11 @@ public class NewVehicleRegistration extends ApplicationProgram {
 					"from people " +
 					"where people.sin="+sin;
 			ResultSet rs = statement.executeQuery(checkPeopleStmt);
-			count = 0;
-			while (rs.next()){
-				count++;
-			}
+			
+			rs.last();
+			int returned_rows = rs.getRow();
+			rs.first();
+			
 		} catch (SQLException e){
 			e.printStackTrace();
 			System.out.print(e.getMessage());
