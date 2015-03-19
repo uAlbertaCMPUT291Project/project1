@@ -11,7 +11,7 @@ import java.util.Scanner;
 //loaded in the initial database.
 
 public class NewVehicleRegistration extends ApplicationProgram {
-	int count;
+	boolean existance;
 	@Override
 	void run() {
 		
@@ -20,71 +20,60 @@ public class NewVehicleRegistration extends ApplicationProgram {
 		//involved tables: vehicle, owner, people
 		//owner sin and vehicle id shared in owner table
 				
-		
+		//while loop
 		//get vehicle id/info from user	
 		System.out.println("Enter vehicle serial number:");
 		String serial_no = user_input.nextLine();
 		//check if vehicle already exists
 		
-		System.out.println("Enter vehicle maker:");
-		String maker = user_input.nextLine();
-		System.out.println("Enter vehicle model:");
-		String model = user_input.nextLine();
-		System.out.println("Enter vehicle year:");
-		String year = user_input.nextLine();
-		System.out.println("Enter vehicle color:");
-		String color = user_input.nextLine();
+		existance = checkVehicleExistance(serial_no);
 		
-		//idea - display vehicle types and their id's
-		System.out.println("Enter vehicle type id:");
-		String type_id = user_input.nextLine();
+		if (existance==false){
+			System.out.println("Enter vehicle maker:");
+			String maker = user_input.nextLine();
+			System.out.println("Enter vehicle model:");
+			String model = user_input.nextLine();
+			System.out.println("Enter vehicle year:");
+			String year = user_input.nextLine();
+			System.out.println("Enter vehicle color:");
+			String color = user_input.nextLine();
 
-		
-		//check that the vehicle does not exist already
-		//if exists - tell user & start over - will sql error if this happens?
-		
-		
-		//add vehicle to vehicle table, if it doesn't exists
-		try{
-			Statement statement = DatabaseConnection.getConnection().createStatement();
-			String vehicleStmt = "insert into vehicle values ('"+serial_no+"', '"+maker+"', '"
-										+model+"', "+year+", '"+color+"', "+type_id+")";
-			statement.executeUpdate(vehicleStmt);
-			System.out.println("Vehicle added");
-		} catch (SQLException e){
-			//e.printStackTrace();
-			System.out.print(e.getMessage());
-			//try again
+			//idea - display vehicle types and their id's
+			System.out.println("Enter vehicle type id:");
+			String type_id = user_input.nextLine();
+
+
+
+			//add vehicle to vehicle table, if it doesn't exists
+			try{
+				Statement statement = DatabaseConnection.getConnection().createStatement();
+				String vehicleStmt = "insert into vehicle values ('"+serial_no+"', '"+maker+"', '"
+						+model+"', "+year+", '"+color+"', "+type_id+")";
+				statement.executeUpdate(vehicleStmt);
+				System.out.println("Vehicle added");
+			} catch (SQLException e){
+				//e.printStackTrace();
+				System.out.print(e.getMessage());
+				//try again
+			}
+		} else {
+			System.out.print("vehicle already exists\n");
+			serial_no = null;
+			//ask if quit or try again
 		}
-		
+
 		// get people (check existence - add if neccessary), add owner
 		
 		//person
 		System.out.println("Enter owner's sin:");
 		String sin = user_input.nextLine();
 		
+		existance = checkPersonExistance(sin);
 		//check if person exists
 		//check if person is already in people table
 		//if not get and add all their info
-		try{
-			Statement statement = DatabaseConnection.getConnection().createStatement(
-											ResultSet.TYPE_SCROLL_INSENSITIVE,ResultSet.CONCUR_READ_ONLY);
-			String checkPeopleStmt = "select sin " +
-					"from people " +
-					"where people.sin="+sin;
-			ResultSet rs = statement.executeQuery(checkPeopleStmt);
-			
-			rs.last();
-			int returned_rows = rs.getRow();
-			rs.first();
-			
-		} catch (SQLException e){
-			e.printStackTrace();
-			System.out.print(e.getMessage());
-		}
-		//if (statement is not empty){ person already exists}
 		//person - if necessary (sin does not exist in table)
-		if (count!=0){
+		if (existance==false){
 			System.out.println("Enter owner's name:");
 			String name = user_input.nextLine();
 			System.out.println("Enter owner's height:");
@@ -106,6 +95,7 @@ public class NewVehicleRegistration extends ApplicationProgram {
 			//add person - not complete
 			//date yyyy-mm-dd
 			try{
+				System.out.println("here");
 				Statement statement = DatabaseConnection.getConnection().createStatement();
 				String peopleStmt = "insert into people values ('"+sin+"', '"+name+"', "
 								+height+", "+weight+", '"+eyecolor+"', '"+haircolor
@@ -136,5 +126,51 @@ public class NewVehicleRegistration extends ApplicationProgram {
 		}
 		
 	}
+	
+	//returns false if person doesn't exist, true if person does exist.
+	private boolean checkPersonExistance(String sin) {
 
+		try {
+			Statement stmt = DatabaseConnection.getConnection()
+					.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,
+							ResultSet.CONCUR_READ_ONLY);
+
+			String query = "select * from people where sin = '"
+					+ sin + "'";
+			ResultSet rs = stmt.executeQuery(query);
+
+			rs.last();
+			if (rs.getRow() > 0) {
+				return true;
+			}
+
+		} catch (SQLException e) {
+			System.out.println(e.getMessage());
+		}
+		return false;
+	}
+	//returns false if vehicle doesn't exist, true if vehicle does exist.
+	private boolean checkVehicleExistance(String serial_no) {
+
+		try {
+			Statement stmt = DatabaseConnection.getConnection()
+					.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,
+							ResultSet.CONCUR_READ_ONLY);
+
+			String query = "select * from vehicle where lower(serial_no) = lower('"
+					+ serial_no+ "')";
+			ResultSet rs = stmt.executeQuery(query);
+
+			rs.last();
+			if (rs.getRow() > 0) {
+				return true;
+			}
+
+		} catch (SQLException e) {
+			System.out.println(e.getMessage());
+		}
+		return false;
+	}
+	
+	
 }
