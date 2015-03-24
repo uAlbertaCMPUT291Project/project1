@@ -8,11 +8,28 @@ public class SearchEngine extends ApplicationProgram {
 
 	@Override
 	void run() {
-		int userMenuInput = getMenuInput();		
-		if (userMenuInput==1){
+		try {
+			int userMenuInput = getMenuInput();		
+			Scanner scanner = new Scanner(System.in);
 			
+
+			if (userMenuInput==1){
+				System.out.println("Enter adriver licence number");
+				String licenceNo = scanner.nextLine();
+				String query = "SELECT name,licence_no FROM drive_licence l, people p WHERE p.sin=l.sin AND l.licence_no ="+licenceNo;
+				ResultSet searchResultSet = runQuery(query);
+				while(searchResultSet.next()){
+					System.out.println(searchResultSet.getString("name")+" "+searchResultSet.getString("licence_no"));
+				}
+			}
+			
+
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+			System.out.println("[Database Error] Searching Engine terminated, sending user back to main menu.");
+			return;
 		}
-		
 	}
 	
 	/*private ResultSet getDriveLicenceByLicenceNo(String licenceNo){
