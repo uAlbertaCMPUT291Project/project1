@@ -18,63 +18,203 @@ public class AutoTransaction extends ApplicationProgram {
 	String buyerSIN;
 	// the vehicles serial number
 	String vehicleSerial;
+	// the transaction date
+	String transactionDate;
+	// the price
+	String price;
+	// transaction ID
+	int transactionID;
 
 	@Override
 	void run() {
 
-		sellerSIN = null;
-		buyerSIN = null;
-		vehicleSerial = null;
-
 		System.out
 				.println("Welcome to the Auto Transaction Section of the program\n");
+		String mainloop = "not exit";
+		outerloop:
+		while (!mainloop.equalsIgnoreCase("exit")) {
 
-		while (vehicleSerial == null) {
-			String input = getStringfromUser("Please enter the vehicle serial number that is being sold. Enter 'exit' to quit");
-			if (input.equalsIgnoreCase("exit")) {
-				System.out.println("You have requested to exit");
-				return;
-			}
-			if (!checkVehicleSerial(input)) {
-				System.out
-						.println("That vehicle serial number does not match any records.");
-			} else {
-				vehicleSerial = input;
-			}
-		}
+			sellerSIN = null;
+			buyerSIN = null;
+			vehicleSerial = null;
+			transactionDate = null;
+			price = null;
+			transactionID = 0;
 
-		sellerSIN = getSellerfromUser(vehicleSerial);
-		if (sellerSIN == null) {
-			System.out.println("You have requested to exit");
-			return;
-		}
-
-		while (buyerSIN == null) {
-			String input = getStringfromUser("Please enter the buyer name. Enter 'exit' to quit");
-			if (input.equalsIgnoreCase("exit")) {
-				System.out.println("You have requested to exit");
-				return;
-			}
-			buyerSIN = getSINfromName(input);
-			if (buyerSIN == null) {
-				System.out.print("No such buyer exists. ");
-
-				input = getStringfromUser("Enter 'new' to add buyer to database, 'exit' to quit, or anything else to enter a different buyer.");
+			// get vehicle serial number
+			while (vehicleSerial == null) {
+				String input = getStringfromUser("Please enter the vehicle serial number that is being sold. Enter 'exit' to quit");
 				if (input.equalsIgnoreCase("exit")) {
 					System.out.println("You have requested to exit");
 					return;
-				} else if (input.equalsIgnoreCase("new")) {
-					System.out.println("implement add buyer yet");
+				}
+				if (!checkVehicleSerial(input)) {
+					System.out
+							.println("That vehicle serial number does not match any records.");
+				} else {
+					vehicleSerial = input;
 				}
 			}
-			else if (buyerSIN.equalsIgnoreCase("exit")) {
+
+			vehicleSerial = vehicleSerial.toUpperCase();
+
+			// get the seller sin
+			sellerSIN = getSellerfromUser(vehicleSerial);
+			if (sellerSIN == null) {
 				System.out.println("You have requested to exit");
 				return;
 			}
+
+			sellerSIN = sellerSIN.toUpperCase();
+
+			// get buyer SIN
+			while (buyerSIN == null) {
+				String input = getStringfromUser("Please enter the buyer name. Enter 'exit' to quit");
+				String nameEntered = input;
+				if (input.equalsIgnoreCase("exit")) {
+					System.out.println("You have requested to exit");
+					return;
+				}
+				buyerSIN = getSINfromName(input);
+				if (buyerSIN == null) {
+					System.out.print("No such buyer exists. ");
+
+					input = getStringfromUser("Enter 'new' to add buyer to database, 'exit' to quit, or anything else to enter a different buyer.");
+					if (input.equalsIgnoreCase("exit")) {
+						System.out.println("You have requested to exit");
+						return;
+					} else if (input.equalsIgnoreCase("new")) {
+						buyerSIN = addPerson(nameEntered);
+						if (buyerSIN == null) {
+							System.out.println("Error creating new buyer");
+						}
+						else if (buyerSIN.equalsIgnoreCase("exit")) {
+							System.out.println("You have requested to exit");
+							return;
+						}
+						 
+					}
+				} else if (buyerSIN.equalsIgnoreCase("exit")) {
+					System.out.println("You have requested to exit");
+					return;
+				}
+			}
+
+			buyerSIN = buyerSIN.toUpperCase();
+
+			// get date from user
+			while (transactionDate == null) {
+				String input = getStringfromUser("Please enter the transaction date in the form yyyy-mm-dd (eg. enter 2014-08-30 for August 30, 2014). Enter 'exit' to quit");
+				if (input.equalsIgnoreCase("exit")) {
+					System.out.println("You have requested to exit");
+					return;
+				}
+
+				transactionDate = input;
+			}
+
+			// get the price from the user
+			while (price == null) {
+				String input = getStringfromUser("Please enter the price of the transaction (eg. 15469.47). Enter 'exit' to quit");
+				if (input.equalsIgnoreCase("exit")) {
+					System.out.println("You have requested to exit");
+					return;
+				}
+				price = input;
+			}
+			// get the next transaction ID
+			transactionID = getNextTransactionID();
+
+			boolean result = createNewTransaction();
+			if (!result) {
+				System.out
+						.println("The auto transaction was not succesfull. No data was changed, now exiting.");
+			}
+
+			result = addNewOwnerAndRemoveOthers();
+			if (!result) {
+				System.out
+						.println("Auto Transaction completed successfully but could not add new owner or remove previous owners.");
+			}
+
+			System.out.println("Transaction has been entered and updated successfully");
+
+			mainloop = getStringfromUser("Please enter 'exit' to go back to the main menu or any key to enter another transaction");
+
 		}
 
-		System.out.println("Seller: " + sellerSIN + "Buyer: " + buyerSIN);
+	}
 
+	private boolean addNewOwnerAndRemoveOthers() {
+		Statement stmt;
+
+		try {
+			stmt = DatabaseConnection.getConnection().createStatement(
+					ResultSet.TYPE_SCROLL_INSENSITIVE,
+					ResultSet.CONCUR_READ_ONLY);
+
+			// add new owner
+			String query = "INSERT into owner values ('" + buyerSIN + "', '"
+					+ vehicleSerial + "', 'y')";
+			stmt.executeUpdate(query);
+
+			// delete other owners
+			String delete_command = "DELETE from owner WHERE vehicle_id = '"
+					+ vehicleSerial + "' AND owner_id <> '" + buyerSIN + "'";
+			stmt.executeUpdate(delete_command);
+
+		} catch (SQLException e) {
+
+			System.out.println(e.getMessage());
+			return false;
+		}
+		return true;
+	}
+
+	private boolean createNewTransaction() {
+		Statement stmt;
+
+		try {
+			stmt = DatabaseConnection.getConnection().createStatement(
+					ResultSet.TYPE_SCROLL_INSENSITIVE,
+					ResultSet.CONCUR_READ_ONLY);
+
+			String update = "INSERT into auto_sale values (" + transactionID
+					+ ", '" + sellerSIN + "', '" + buyerSIN + "', '"
+					+ vehicleSerial + "', date '" + transactionDate + "', "
+					+ price + ")";
+
+			stmt.executeUpdate(update);
+
+		} catch (SQLException e) {
+
+			System.out.println(e.getMessage());
+			return false;
+		}
+		return true;
+
+	}
+
+	// returns 1 + the current max transaction ID
+	private int getNextTransactionID() {
+
+		Statement stmt;
+		int next_transactionID = 0;
+
+		try {
+			stmt = DatabaseConnection.getConnection().createStatement(
+					ResultSet.TYPE_SCROLL_INSENSITIVE,
+					ResultSet.CONCUR_READ_ONLY);
+			String query = "SELECT MAX(transaction_id) FROM auto_sale";
+			ResultSet rs = stmt.executeQuery(query);
+			rs.next();
+			next_transactionID = rs.getInt("MAX(TRANSACTION_ID)");
+		} catch (SQLException e) {
+
+			System.out.println(e.getMessage());
+			return -1;
+		}
+		return next_transactionID + 1;
 	}
 
 	/*
@@ -118,7 +258,8 @@ public class AutoTransaction extends ApplicationProgram {
 						+ rs.getString("is_primary_owner") + "\t\t"
 						+ rs.getString("name"));
 			}
-			System.out.println(i + 1 + ":\tSelect me to exit and cancel the transaction");
+			System.out.println(i + 1 + ":\tSelect " + (i + 1)
+					+ " to exit and cancel the transaction");
 			// get user to select from current owners
 			while (user_option < 1 || user_option > returned_rows + 1) {
 				if (!user_input.hasNextInt()) {
@@ -165,6 +306,7 @@ public class AutoTransaction extends ApplicationProgram {
 
 		} catch (SQLException e) {
 			System.out.println(e.getMessage());
+			return false;
 		}
 		return true;
 	}
@@ -184,8 +326,8 @@ public class AutoTransaction extends ApplicationProgram {
 	/*
 	 * trys to find the SIN from the inputed name
 	 * 
-	 * if no such person exists, null is returned 
-	 * if multiple people have the same name the user is prompted to select which person they want
+	 * if no such person exists, null is returned if multiple people have the
+	 * same name the user is prompted to select which person they want
 	 */
 	private String getSINfromName(String name) {
 
@@ -225,7 +367,8 @@ public class AutoTransaction extends ApplicationProgram {
 						+ rs.getString("gender") + "\t"
 						+ rs.getDate("birthday") + "\t" + rs.getString("name"));
 			}
-			System.out.println(i + 1 + ":\tSelect me to exit and cancel the transaction");
+			System.out.println(i + 1 + ":\tSelect " + (i + 1)
+					+ " to exit and cancel the transaction");
 			// get user to select from current owners
 			while (user_option < 1 || user_option > returned_rows + 1) {
 				if (!user_input.hasNextInt()) {
@@ -246,16 +389,70 @@ public class AutoTransaction extends ApplicationProgram {
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			System.out.println(e.getMessage());
+			return null;
 		}
-		return null;
 	}
 
-	/*
-	 * String query = "select * from movie"; ResultSet rs =
-	 * stmt.executeQuery(query);
-	 * 
-	 * while (rs.next()) { System.out.println(rs.getString("title") + ", " +
-	 * rs.getInt("movie_number")); }
-	 */
+	// adds a person if they do not exist
+	private String addPerson(String name) {
+		
+		// check if person exists
+		// add the person if they do not exist
+		String sin = getStringfromUser("Enter " + name + "'s sin");
+		
+		while(checkPersonExistance(sin)) {
+			sin = getStringfromUser("That sin already exisits. Enter a new SIN or 'exit' to quit");
+			if (sin.equalsIgnoreCase("exit")) {
+				return "exit";
+			}
+		}
+		
+		String height = getStringfromUser("Enter " + name + "'s height");
+		String weight = getStringfromUser("Enter " + name + "'s weight");
+		String eyecolor = getStringfromUser("Enter " + name + "'s eye color");
+		String haircolor = getStringfromUser("Enter " + name + "'s hair color");
+		String address = getStringfromUser("Enter " + name + "'s address");
+		String gender = getStringfromUser("Enter " + name + "'s gender (m/f)");
+		String birthday = getStringfromUser("Enter " + name + "'s birthday (YYYY-MM-DD)");
+
+		try {
+			Statement statement = DatabaseConnection.getConnection()
+					.createStatement();
+			String peopleStmt = "insert into people values ('" + sin + "', '"
+					+ name + "', " + height + ", " + weight + ", '" + eyecolor
+					+ "', '" + haircolor + "', '" + address + "', '" + gender
+					+ "', TO_DATE('" + birthday + "', 'YYYY-MM-DD'))";
+			statement.executeUpdate(peopleStmt);
+			System.out.println(name + " has been added to database and will be used as the new buyer");
+			
+			return sin;
+		} catch (SQLException e) {
+			System.out.print(e.getMessage());
+			return null;
+		}
+	}
+	
+	//returns false if person doesn't exist, true if person does exist.
+	private boolean checkPersonExistance(String sin) {
+
+		try {
+			Statement stmt = DatabaseConnection.getConnection()
+					.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,
+							ResultSet.CONCUR_READ_ONLY);
+
+			String query = "select * from people where sin = '"
+					+ sin + "'";
+			ResultSet rs = stmt.executeQuery(query);
+
+			rs.last();
+			if (rs.getRow() > 0) {
+				return true;
+			}
+
+		} catch (SQLException e) {
+			System.out.println(e.getMessage());
+		}
+		return false;
+	}
 
 }
