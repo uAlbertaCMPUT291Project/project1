@@ -10,7 +10,8 @@ import java.util.Scanner;
 //You may assume that all the information about vehicle types has been 
 //loaded in the initial database.
 
-//check data types
+//loops
+//quits
 public class NewVehicleRegistration extends ApplicationProgram {
 	boolean existance;
 	String is_primary_owner;
@@ -72,6 +73,8 @@ public class NewVehicleRegistration extends ApplicationProgram {
 			sin = user_input.nextLine();
 			addPerson(sin);
 			addOwner(serial_no,sin);
+		} else {
+			return;
 		}
 		
 	}
@@ -120,6 +123,8 @@ public class NewVehicleRegistration extends ApplicationProgram {
 		}
 		return false;
 	}
+	
+	//adds a person if they do not exist
 	private void addPerson(String sin){
 		//check if person exists
 		existance = checkPersonExistance(sin);
@@ -156,7 +161,7 @@ public class NewVehicleRegistration extends ApplicationProgram {
 			}
 		}
 	}
-	
+	//adds the ownership to owner table
 	private void addOwner(String serial_no, String sin){
 		//are they primary owner - check if already have a primary owner?
 		System.out.println("Are they the primary owner? (y/n):");
