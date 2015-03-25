@@ -7,6 +7,8 @@ import java.sql.*;
 //Leah
 public class DriverLicenceRegistration extends ApplicationProgram {
 	boolean existance = true;
+	boolean licenceExist;
+	boolean alreadyExists;
 	String sin = null;
 	Scanner user_input = new Scanner( System.in );
 	@Override
@@ -20,12 +22,31 @@ public class DriverLicenceRegistration extends ApplicationProgram {
 			return;
 		}
 		
+		//check if licence number already exists
+		alreadyExists = licenceExists(licence);
+		if (alreadyExists==true){
+			System.out.println("That licence number already exists");
+			System.out.println("Request failed");
+			return;
+		}
+		
+		
 		System.out.println("Please enter sin. Enter 'exit' to quit.");
 		sin = user_input.nextLine();
 		if (sin.equalsIgnoreCase("exit")) {
 			System.out.println("You have requested to exit");
 			return;
 		}
+		//check if person already has a licence
+		licenceExist = alreadyHasLicence(sin);
+		if (licenceExist == true){
+			//person already has a licence
+			System.out.println("That person already has a licence.");
+			System.out.println("Request failed");
+			//System.out.println("You will now return to the main menu.");
+			return;
+		}
+		//check if person exists, if not add them.
 		addPerson(sin);
 		
 		System.out.println("Please enter class. Enter 'exit' to quit ");
@@ -63,6 +84,7 @@ public class DriverLicenceRegistration extends ApplicationProgram {
 			File file = new File(filePath);
 			stmt.setBinaryStream(1, new FileInputStream(file), (int)file.length());
 			stmt.executeUpdate();
+			System.out.println("Licence added");
 		} catch (SQLException e) {
 			e.printStackTrace();
 		} catch (FileNotFoundException e) {
@@ -135,6 +157,48 @@ public class DriverLicenceRegistration extends ApplicationProgram {
 				}
 			}
 		}
+	}
+	
+	private boolean alreadyHasLicence(String sin){
+		try {
+			Statement stmt = DatabaseConnection.getConnection()
+					.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,
+							ResultSet.CONCUR_READ_ONLY);
+
+			String query = "select * from drive_licence where lower(sin) = lower('"
+					+ sin+ "')";
+			ResultSet rs = stmt.executeQuery(query);
+
+			rs.last();
+			if (rs.getRow() > 0) {
+				return true;
+			}
+
+		} catch (SQLException e) {
+			System.out.println(e.getMessage());
+		}
+		return false;
+	}
+	
+	private boolean licenceExists(String licence_no){
+		try {
+			Statement stmt = DatabaseConnection.getConnection()
+					.createStatement(ResultSet.TYPE_SCROLL_INSENSITIVE,
+							ResultSet.CONCUR_READ_ONLY);
+
+			String query = "select * from drive_licence where lower(licence_no) = lower('"
+					+ licence_no+ "')";
+			ResultSet rs = stmt.executeQuery(query);
+
+			rs.last();
+			if (rs.getRow() > 0) {
+				return true;
+			}
+
+		} catch (SQLException e) {
+			System.out.println(e.getMessage());
+		}
+		return false;
 	}
 	
 }
