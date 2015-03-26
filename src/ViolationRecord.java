@@ -1,7 +1,7 @@
 //Jim
-
-import java.io.IOException;
 import java.sql.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Scanner;
 
 public class ViolationRecord extends ApplicationProgram {
@@ -30,7 +30,7 @@ public class ViolationRecord extends ApplicationProgram {
 			descriptions = promptUserForDescriptions();
 			
 			runQuery("insert into ticket values('"+ticketNo+"','"+violatorSin+"','"+vehicleSerialNo+"','"
-												  +officerSin+"','"+vtype+"',TO_DATE('"+vdate+"','yyyy/mm/dd hh24:mi:ss'),'"+place+"','"+descriptions+"')");
+												  +officerSin+"','"+vtype+"',TO_DATE('"+vdate+"','yyyy/mm/dd'),'"+place+"','"+descriptions+"')");
 			
 			System.out.println("Ticket Recorded");
 		} catch (SQLException e) {
@@ -105,9 +105,16 @@ public class ViolationRecord extends ApplicationProgram {
 	
 	private String promptUserForVdate(){
 		Scanner scanner = new Scanner (System.in);	
-		System.out.println("Enter the violation date (yyyy/mm/dd hh24:mi:ss):");
-		String vdate = scanner.nextLine();
-
+		String vdate;
+		while(true){
+			System.out.println("Enter the violation date \"yyyy/mm/dd\":");
+			vdate = scanner.nextLine();
+			if (validDate(vdate)){
+				break;
+			}else{
+				System.out.println("Date entered doesn't match \"yyyy/mm/dd\"");
+			}
+		}
 		return vdate;		
 	}
 	
@@ -175,6 +182,14 @@ public class ViolationRecord extends ApplicationProgram {
 		return resultSet;		
 	}
 	
+	private boolean validDate(String dateString){
+		try {
+			new SimpleDateFormat("yyyy/MM/dd").parse( dateString);
+		} catch (ParseException e) {
+			return false;
+		}
+		return true;
+	}
 	
 
 
